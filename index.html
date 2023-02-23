@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <title>Password Generator</title>
+    <link rel="stylesheet" href="./dist/output.css">
+</head>
+
+<body class="font-mono">
+    <div class="flex justify-center items-center min-h-screen bg-neutral-900">
+        <div class="flex flex-col gap-5 w-3/4">
+            <h1 class="text-3xl text-gray-50 font-mono">Password Generator</h1>
+            <div class="flex flex-col gap-2">
+                <label class="text-neutral-400">Phrase (Only Space)</label>
+                <input type="text" name="phrase" id="phrase" placeholder="Phrase"
+                    class="w-full rounded-md border border-neutral-600 bg-white py-3 px-6 text-base font-medium text-[#6B7280] focus:outline outline-offset-2 outline-2  focus:border-[#6A64F1] focus:shadow-md" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="text-neutral-400">Website (EX: Facebook)</label>
+                <input type="text" name="website" id="website" placeholder="Website"
+                    class="w-full rounded-md border border-neutral-600 bg-white py-3 px-6 text-base font-medium text-[#6B7280] focus:outline outline-offset-2 outline-2  focus:border-[#6A64F1] focus:shadow-md" />
+            </div>
+            <div class="flex flex-col justify-center gap-5 w-72">
+                <div class="flex gap-2 items-center justify-between">
+                    <label for="url" class="text-neutral-400 pr-3">URL</label>
+                    <input id="url" name="url" type="checkbox"
+                        class="appearance-none w-9 focus:outline-none checked:bg-blue-300 h-5 bg-gray-300 rounded-full before:inline-block before:rounded-full before:bg-blue-500 before:h-4 before:w-4 checked:before:translate-x-full shadow-inner transition-all duration-300 before:ml-0.5" />
+
+                </div>
+                <div class="flex gap-2 items-center justify-between">
+                    <label for="num" class="text-neutral-400 pr-3">Number</label>
+                    <input id="num" name="num" type="checkbox" checked
+                        class="appearance-none w-9 focus:outline-none checked:bg-blue-300 h-5 bg-gray-300 rounded-full before:inline-block before:rounded-full before:bg-blue-500 before:h-4 before:w-4 checked:before:translate-x-full shadow-inner transition-all duration-300 before:ml-0.5" />
+                </div>
+                <div class="flex gap-2 items-center justify-between">
+                    <label for="specialChar" class="text-neutral-400 pr-3">Special Characters</label>
+                    <input id="specialChar" name="specialChar" type="checkbox" checked
+                        class="appearance-none w-9 focus:outline-none checked:bg-blue-300 h-5 bg-gray-300 rounded-full before:inline-block before:rounded-full before:bg-blue-500 before:h-4 before:w-4 checked:before:translate-x-full shadow-inner transition-all duration-300 before:ml-0.5" />
+                </div>
+            </div>
+            <div class="flex flex-col gap-2 relative">
+                <label class="text-neutral-400">Generated Password</label>
+                <input type="text" name="password" id="password" placeholder="Password"
+                    class="w-full rounded-md border border-neutral-600 bg-neutral-700 py-3 px-6 text-base font-medium text-neutral-200 focus:outline outline-offset-2 outline-2  focus:border-[#6A64F1] focus:shadow-md" />
+                <button id="copyBtn"
+                    class="bg-blue-400 mt-5 flex-none p-2 rounded-md font-mono tracking-widest text-sm w-20 absolute bottom-1.5 right-2 hover:bg-blue-500 transition">
+                    COPY
+                </button>
+            </div>
+            <div class="flex flex-col gap-2 relative">
+                <label class="text-neutral-400">Short Password</label>
+                <input type="text" name="passwordShort" id="passwordShort" placeholder="Password Short"
+                    class="w-full rounded-md border border-neutral-600 bg-neutral-700 py-3 px-6 text-base font-medium text-neutral-200 focus:outline outline-offset-2 outline-2  focus:border-[#6A64F1] focus:shadow-md" />
+                <button id="copyBtnShort"
+                    class="bg-blue-400 mt-5 flex-none p-2 rounded-md font-mono tracking-widest text-sm w-20 absolute bottom-1.5 right-2 hover:bg-blue-500 transition">
+                    COPY
+                </button>
+            </div>
+            <button onclick="generatePassword()"
+                class="bg-blue-400 p-2 rounded-md font-mono tracking-widest text-xl hover:bg-blue-500 transition">
+                GENERATE
+            </button>
+        </div>
+    </div>
+    <script>
+        if ("serviceWorker" in navigator) {
+            // register service worker
+            navigator.serviceWorker.register("service-worker.js");
+          }
+        var output = document.getElementById("password");
+        var outputShort = document.getElementById("passwordShort");
+        const copyBtn = document.getElementById("copyBtn");
+        const copyBtnShort = document.getElementById("copyBtnShort");
+        copyBtn.addEventListener("click", () => {
+            output.select();
+            document.execCommand("copy");
+            copyBtn.innerHTML = "COPIED!";
+        });
+        copyBtnShort.addEventListener("click", () => {
+            outputShort.select();
+            document.execCommand("copy");
+            copyBtnShort.innerHTML = "COPIED!";
+        });
+        function generatePassword() {
+            copyBtn.innerHTML = "COPY";
+            copyBtnShort.innerHTML = "COPY";
+            if (document.getElementById('url').checked) {
+                var website = getDomainName();
+            } else {
+                var website = document.getElementById("website").value;
+            }
+            var phrase = document.getElementById("phrase").value;
+
+            var shortPhrase = getFirstLetters(phrase);
+
+            let concatenatedString = '';
+            let concatenatedStringShort = '';
+            // Step 1: Concatenate the phrase and website name
+            if(document.getElementById('num').checked && document.getElementById('specialChar').checked){
+                concatenatedString = phrase + '2!!2' + website;
+                concatenatedStringShort = shortPhrase + '2!2' + website;
+            } else if(document.getElementById('num').checked) {
+                 concatenatedString = phrase + '22' + website;
+                 concatenatedStringShort = shortPhrase + '2' + website;
+            } else if(document.getElementById('specialChar').checked) {
+                 concatenatedString = phrase + '!!' + website;
+                 concatenatedStringShort = shortPhrase + '!' + website;
+
+            } else {
+                 concatenatedString = phrase + website;
+                 concatenatedStringShort = shortPhrase + website;
+            }
+            
+
+            // Step 2: Remove spaces and convert to lowercase
+            concatenatedString = concatenatedString.replace(/\s+/g, '').toLowerCase();
+            concatenatedStringShort = concatenatedStringShort.replace(/\s+/g, '').toLowerCase();
+            concatenatedString = concatenatedString.charAt(0).toUpperCase() + concatenatedString.slice(1, -1) + concatenatedString.slice(-1).toUpperCase();
+            concatenatedStringShort = concatenatedStringShort.charAt(0).toUpperCase() + concatenatedStringShort.slice(1, -1) + concatenatedStringShort.slice(-1).toUpperCase();
+            // Step 3: Replace o with 0
+            if(document.getElementById('num').checked){
+                concatenatedString = concatenatedString.replace(/o/g, '0');
+                concatenatedString = concatenatedString.replace(/i/g, '1');
+                concatenatedStringShort = concatenatedStringShort.replace(/o/g, '0');
+                concatenatedStringShort = concatenatedStringShort.replace(/i/g, '1');
+
+            }
+            if(document.getElementById('specialChar').checked){
+                concatenatedString = concatenatedString.replace(/a/g, '@');
+                concatenatedStringShort = concatenatedStringShort.replace(/a/g, '@');
+
+
+            }
+
+            let password = concatenatedString;
+            let passwordShort = concatenatedStringShort;
+            output.value = password;
+            outputShort.value = passwordShort;
+            return password;
+        }
+
+        function getDomainName() {
+            const websiteInput = document.getElementById("website");
+            const url = websiteInput.value.trim();
+            const parsedUrl = new URL(url);
+            const domain = parsedUrl.hostname.match(/www\.(.*?)\./)[1];
+            return domain;
+        }
+
+        function getFirstLetters(sentence) {
+            const words = sentence.split(' ');
+            const firstLetters = words.map(word => word.charAt(0));
+            return firstLetters.join('').toLowerCase();
+          }          
+
+        function copyToClipboard() {
+            // Get the text field
+            var copyText = document.getElementById("password");
+            var copyTextShort = document.getElementById("passwordShort");
+
+            // Select the text field
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // For mobile devices
+
+            // Copy the text inside the text field
+            navigator.clipboard.writeText(copyText.value);
+
+            // Alert the copied text
+            copiedEvent = document.createEvent("HTMLEvents");
+            copiedEvent.initEvent("copiedEvent", true, true);
+            copiedEvent.eventName = "copiedEvent";
+            document.dispatchEvent(copiedEvent);
+        }
+    </script>
+</body>
+
+</html>
